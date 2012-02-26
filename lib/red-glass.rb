@@ -1,0 +1,1 @@
+require 'red-glass/red_glass'
