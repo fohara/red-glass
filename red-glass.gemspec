@@ -9,9 +9,8 @@ Gem::Specification.new do |s|
   s.files       = Dir.glob("{lib}/**/*")
   s.homepage    = 'http://rubygems.org/gems/red-glass'
   s.add_dependency 'sinatra'
+  s.add_dependency 'em-websocket'
   s.add_dependency 'selenium-webdriver'
-  s.add_dependency 'mongo_mapper'
   s.add_dependency 'json'
-  s.add_dependency 'bson_ext'
   s.add_dependency 'uuid'
 end
