@@ -94,6 +94,7 @@ table {
     background-color: #c1c0c0;
     width: 480px;
     padding:  5px;
+    word-wrap: break-word;
 }
 
 tbody tr:nth-of-type(odd) td {
