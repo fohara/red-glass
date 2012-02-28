@@ -6,7 +6,6 @@ class RedGlass
   attr_accessor :driver, :test_id, :opts, :port
 
   PROJ_ROOT = File.dirname(__FILE__).to_s
-  puts "******Current dir: #{PROJ_ROOT}"
 
   def initialize(driver, opts={})
     @driver = driver
