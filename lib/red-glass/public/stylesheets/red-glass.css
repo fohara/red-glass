@@ -1,3 +1,19 @@
+a#kill	{
+	text-decoration: none;
+}
+
+a#kill:link {
+	color: white;
+}
+
+a#kill:visited {
+	color: white;
+}
+
+a#kill:hover {
+	color: red;
+}
+
 .ajaxComplete {
     background-color: blue;
 }
@@ -14,6 +30,7 @@ body {
 .container {
     min-height: 600px;
     margin-top: 10px;
+    margin-bottom: 10px;
     padding: 10px;
     border-radius:10px;
     -moz-border-radius:10px;
@@ -76,6 +93,14 @@ body {
 
 .event.xhr {
     background-color: blue;
+}
+
+h1 {
+    text-align: center;
+}
+
+#killed {
+    color: white;
 }
 
 #main {

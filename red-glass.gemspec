@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'http://rubygems.org/gems/red-glass'
   s.add_dependency 'sinatra'
   s.add_dependency 'em-websocket'
+  s.add_dependency 'thin'
   s.add_dependency 'selenium-webdriver'
   s.add_dependency 'json'
   s.add_dependency 'uuid'

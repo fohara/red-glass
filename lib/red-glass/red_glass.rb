@@ -59,6 +59,7 @@ class RedGlass
   end
 
   def has_jQuery?
+    #@driver.execute_script "delete jQuery"
     @driver.execute_script "var hasJQuery = typeof jQuery == 'function' ? true : false; return hasJQuery"
   end
 

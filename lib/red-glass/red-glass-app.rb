@@ -16,10 +16,14 @@ EventMachine.run do
       erb :index
     end
 
-    post '/' do
+    post '/?' do
       event = JSON.parse(params[:event_json])
-      uuid = UUID.new
-      event['id'] = uuid.generate
+      begin
+        uuid = UUID.new
+        event['id'] = uuid.generate
+      rescue
+        event['id'] = event['time']
+      end
       events << event
       if is_socket_connected
         socket.send events.to_json
@@ -35,7 +39,7 @@ EventMachine.run do
       Process.kill('INT', 0)
     end
 
-    EventMachine::WebSocket.start(:host => '0.0.0.0', :port => 8080) do |ws|
+    EventMachine::WebSocket.start(:host => '0.0.0.0', :port => 4568) do |ws|
       socket = ws
 
       ws.onopen { is_socket_connected = true }
