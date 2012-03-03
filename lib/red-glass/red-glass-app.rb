@@ -36,6 +36,7 @@ EventMachine.run do
     end
 
     get '/kill' do
+      puts 'kill request received'
       Process.kill('INT', 0)
     end
 
