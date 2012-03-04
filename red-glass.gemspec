@@ -14,4 +14,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'selenium-webdriver'
   s.add_dependency 'json'
   s.add_dependency 'uuid'
+  s.add_development_dependency 'rack-test'
 end

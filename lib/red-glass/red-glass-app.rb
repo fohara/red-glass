@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'thin'
 require 'em-websocket'
 require "uuid"
 require 'json'
@@ -27,6 +28,10 @@ class RedGlassApp < Sinatra::Base
       socket.send events.to_json
       events.clear
     end
+  end
+
+  get '/events' do
+    events.to_json
   end
 
   get '/status' do
