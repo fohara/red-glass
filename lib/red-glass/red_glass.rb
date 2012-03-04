@@ -3,7 +3,7 @@ require "uuid"
 require "net/http"
 
 class RedGlass
-  attr_accessor :driver, :test_id, :opts, :port
+  attr_accessor :driver, :test_id, :opts, :port, :pid
 
   PROJ_ROOT = File.dirname(__FILE__).to_s
 
@@ -16,6 +16,7 @@ class RedGlass
     set_config
     if !is_server_ready? 1
       pid = Process.spawn("ruby","#{PROJ_ROOT}/red-glass-app.rb")
+      @pid = pid
       raise "Red Glass server could not bet started." if !is_server_ready?
       Process.detach pid
     end
