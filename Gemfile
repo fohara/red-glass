@@ -1,6 +1,8 @@
 source :rubygems
 gem 'sinatra'
+gem 'em-websocket'
+gem 'thin'
 gem 'selenium-webdriver'
 gem 'json'
 gem 'uuid'
-gem 'em-websocket'
+gem 'rack-test'

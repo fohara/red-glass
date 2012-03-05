@@ -29,7 +29,7 @@ class TestRedGlassApp < Test::Unit::TestCase
     assert_equal '[]', last_response.body
   end
 
-  def test_get_events
+  def test_get_single_event
     post '/', "event_json" => @event_json.to_json
     get '/events'
     assert_equal @event_json['url'], JSON.parse(last_response.body)[0]['url']
@@ -37,6 +37,14 @@ class TestRedGlassApp < Test::Unit::TestCase
     assert_equal @event_json['time'], JSON.parse(last_response.body)[0]['time']
     assert_equal @event_json['type'], JSON.parse(last_response.body)[0]['type']
     assert_equal @event_json['target'], JSON.parse(last_response.body)[0]['target']
+  end
+
+  def test_get_multiple_events
+    2.times do
+      post '/', "event_json" => @event_json.to_json
+    end
+    get '/events'
+    assert_equal 2, JSON.parse(last_response.body).size
   end
 
 end

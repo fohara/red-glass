@@ -15,14 +15,17 @@ class RedGlass
   def start
     set_config
     if !is_server_ready? 1
-      pid = Process.spawn("ruby","#{PROJ_ROOT}/red-glass-app.rb")
-      @pid = pid
+      @pid = Process.spawn("ruby","#{PROJ_ROOT}/red-glass-app.rb")
       raise "Red Glass server could not bet started." if !is_server_ready?
-      Process.detach pid
+      Process.detach @pid
     end
     uuid = UUID.new
     @test_id = uuid.generate
     load_js
+  end
+
+  def stop
+    Process.kill('INT', @pid)
   end
 
   private
@@ -39,10 +42,7 @@ class RedGlass
       rescue
         is_server_ready = false
       end
-
-      if is_server_ready || counter >= time_limit
-        break
-      end
+      break if is_server_ready || counter >= time_limit
     end
     is_server_ready
   end
@@ -53,27 +53,21 @@ class RedGlass
   end
 
   def load_js
-    load_jQuery if !has_jQuery?
+    load_jQuery
     load_json2
     load_get_path
     load_red_glass_js
   end
 
-  def has_jQuery?
-    #@driver.execute_script "delete jQuery"
-    @driver.execute_script "var hasJQuery = typeof jQuery == 'function' ? true : false; return hasJQuery"
-  end
-
   def load_jQuery
+    has_jQuery = @driver.execute_script "var hasJQuery = typeof jQuery == 'function' ? true : false; return hasJQuery"
     raw_js = File.open(File.expand_path("#{PROJ_ROOT}/public/scripts/jquery-1.7.1.js"), 'rb').read
-    @driver.execute_script raw_js
+    @driver.execute_script raw_js if !has_jQuery
   end
 
   def load_json2
     has_old_json = @driver.execute_script "var hasOldJSON = typeof JSON.license == 'undefined' ? false : true; return hasOldJSON"
-    if has_old_json
-      @driver.execute_script "delete JSON"
-    end
+    @driver.execute_script "delete JSON" if has_old_json
     raw_js = File.open(File.expand_path("#{PROJ_ROOT}/public/scripts/json2.js"), 'rb').read
     @driver.execute_script raw_js
   end
