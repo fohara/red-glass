@@ -72,7 +72,7 @@ class RedGlass
     @driver.execute_script raw_js
   end
 
-   def load_get_path
+  def load_get_path
     raw_js = File.open(File.expand_path("#{PROJ_ROOT}/public/scripts/jquery.getpath.js"), 'rb').read
     @driver.execute_script raw_js
   end
