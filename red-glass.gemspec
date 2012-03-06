@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
   s.name        = 'red-glass'
   s.version     = '0.0.1'
-  s.date        = '2012-02-25'
-  s.summary     = "Red Glass"
-  s.description = "Selenium event pane."
+  s.date        = '2012-03-05'
+  s.summary     = "Red Glass: Selenium event pane"
+  s.description = "Red Glass works alongside Selenium to observe browser events, and provides an interactive log which illustrates changes to the DOM during an automation session."
   s.authors     = ["Frank O'Hara"]
   s.email       = 'frankj.ohara@gmail.com'
   s.files       = Dir.glob("{lib}/**/*")
