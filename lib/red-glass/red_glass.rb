@@ -61,7 +61,7 @@ class RedGlass
 
   def load_jQuery
     has_jQuery = @driver.execute_script "var hasJQuery = typeof jQuery == 'function' ? true : false; return hasJQuery"
-    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/public/scripts/jquery-1.7.1.js"), 'rb').read
+    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/public/scripts/jquery-1.8.0.min.js"), 'rb').read
     @driver.execute_script raw_js if !has_jQuery
   end
 
