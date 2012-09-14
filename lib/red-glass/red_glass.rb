@@ -1,31 +1,64 @@
 require "selenium-webdriver"
 require "uuid"
 require "net/http"
+require_relative "../Selenium/driver"
+require_relative "../Selenium/element"
+require_relative "../Selenium/navigation"
+require_relative "../Selenium/search_context"
 
 class RedGlass
-  attr_accessor :driver, :test_id, :opts, :port, :pid
+  attr_accessor :driver, :test_id, :opts, :port, :pid, :recording
 
   PROJ_ROOT = File.dirname(__FILE__).to_s
 
   def initialize(driver, opts={})
     @driver = driver
+    @driver.navigate.add_observer self
+    @driver.add_observer self, :found_element_event
     @opts = opts
+    @recording = false
+  end
+
+  def update(url=nil)
+    if @recording
+      reload
+    end
+  end
+
+  def click_event(url=nil)
+    if @recording
+      reload if !has_red_glass_js?
+    end
+  end
+
+  def found_element_event(element)
+    if @recording
+      element.add_observer self, :click_event
+    end
   end
 
   def start
     set_config
-    if !is_server_ready? 1
-      @pid = Process.spawn("ruby","#{PROJ_ROOT}/red-glass-app.rb")
-      raise "Red Glass server could not bet started." if !is_server_ready?
-      Process.detach @pid
-    end
+    start_server
     uuid = UUID.new
     @test_id = uuid.generate
     load_js
+    @recording = true
+  end
+
+  def reload
+    set_config
+    start_server
+    load_js
+  end
+
+  def pause
+    @recording = false
   end
 
   def stop
     Process.kill('INT', @pid)
+    @recording = false
   end
 
   private
@@ -45,6 +78,14 @@ class RedGlass
       break if is_server_ready || counter >= time_limit
     end
     is_server_ready
+  end
+
+  def start_server
+    if !is_server_ready? 1
+      @pid = Process.spawn("ruby","#{PROJ_ROOT}/red-glass-app.rb")
+      raise "Red Glass server could not bet started." if !is_server_ready?
+      Process.detach @pid
+    end
   end
 
   def set_config
@@ -77,11 +118,15 @@ class RedGlass
     @driver.execute_script raw_js
   end
 
+  def has_red_glass_js?
+    @driver.execute_script "var hasRedGlass = typeof jQuery().redGlass == 'function' ? true : false; return hasRedGlass"
+  end
+
   def load_red_glass_js
     raw_js = File.open(File.expand_path("#{PROJ_ROOT}/public/scripts/jquery.red-glass-0.1.0.js"), 'rb').read
-    @driver.execute_script raw_js
+    @driver.execute_script raw_js if !has_red_glass_js?
     @driver.execute_script("jQuery(document).redGlass('#{@test_id}', '#{@port}')")
-    @driver.execute_script "jQuery.noConflict(true)"
+    #@driver.execute_script "jQuery.noConflict(true)"
   end
 
 end
