@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'red-glass'
-  s.version     = '0.0.4'
-  s.date        = '2012-09-14'
+  s.version     = '0.0.5'
+  s.date        = '2012-10-23'
   s.summary     = "Red Glass: Selenium event pane"
   s.description = "Red Glass works alongside Selenium to observe browser events, and provides an interactive log which illustrates changes to the DOM during an automation session."
   s.authors     = ["Frank O'Hara"]
