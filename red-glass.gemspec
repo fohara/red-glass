@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'sinatra'
   s.add_dependency 'em-websocket'
   s.add_dependency 'thin'
-  s.add_dependency 'selenium-webdriver'
+  s.add_dependency 'selenium-webdriver', '>= 2.32.0'
   s.add_dependency 'json'
   s.add_dependency 'uuid'
   s.add_development_dependency 'rack-test'
