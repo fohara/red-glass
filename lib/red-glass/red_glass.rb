@@ -1,10 +1,6 @@
 require "selenium-webdriver"
 require "uuid"
 require "net/http"
-require_relative "../Selenium/driver"
-require_relative "../Selenium/element"
-require_relative "../Selenium/navigation"
-require_relative "../Selenium/search_context"
 
 class RedGlass
   attr_accessor :driver, :test_id, :opts, :port, :pid, :recording
@@ -13,28 +9,9 @@ class RedGlass
 
   def initialize(driver, opts={})
     @driver = driver
-    @driver.navigate.add_observer self
-    @driver.add_observer self, :found_element_event
     @opts = opts
+    opts[:listener].red_glass = self if opts[:listener]
     @recording = false
-  end
-
-  def update(url=nil)
-    if @recording
-      reload
-    end
-  end
-
-  def click_event(url=nil)
-    if @recording
-      reload if !has_red_glass_js?
-    end
-  end
-
-  def found_element_event(element)
-    if @recording
-      element.add_observer self, :click_event
-    end
   end
 
   def start
