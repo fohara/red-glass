@@ -15,4 +15,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'json'
   s.add_dependency 'uuid'
   s.add_development_dependency 'rack-test'
+  s.add_development_dependency 'rspec'
 end

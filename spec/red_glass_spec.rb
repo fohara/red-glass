@@ -1,12 +1,9 @@
+require 'spec_helper'
 require_relative '../lib/red-glass/red_glass'
-require "test/unit"
-require "selenium-webdriver"
-require "json"
 
-class TestRedGlass < Test::Unit::TestCase
-  PROJ_ROOT = File.dirname(__FILE__).to_s
+describe 'RedGlass' do
 
-  def test_events_captured_in_browser_and_sent_to_red_glass_app_server
+  it 'captures browser events and sends them to the RedGlass app server' do
     driver = Selenium::WebDriver.for :firefox
     red_glass = RedGlass.new driver
 
@@ -17,10 +14,9 @@ class TestRedGlass < Test::Unit::TestCase
     driver.quit
     uri = URI.parse("http://localhost:4567/events")
     event = JSON.parse(Net::HTTP.get_response(uri).body.to_s)[0]
-    ['url', 'testID', 'time', 'type', 'target'].each do |property|
-      assert !event[property].nil?
+    %w(url testID time type target).each do |property|
+      event[property].nil?.should be_false
     end
     red_glass.stop
   end
-
 end

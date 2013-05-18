@@ -1,8 +1,6 @@
-require 'rake/testtask'
+require 'rspec/core/rake_task'
 
-Rake::TestTask.new do |t|
-  t.test_files = Dir.glob("test/**/test_*.rb")
-end
+RSpec::Core::RakeTask.new(:spec)
 
-desc "Run tests"
-task :default => :test
+desc 'Run specs'
+task :default => :spec
