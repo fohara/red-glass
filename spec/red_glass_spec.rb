@@ -76,4 +76,60 @@ describe RedGlass do
       red_glass.stop
     end
   end
+
+  describe 'event sequence' do
+    it 'records a click event' do
+      listener = RedGlassListener.new
+      driver = Selenium::WebDriver.for :firefox, :listener => listener
+      red_glass = RedGlass.new driver, {listener: listener}
+      driver.navigate.to "http://google.com"
+      driver.find_element(:id, 'hplogo').click
+      red_glass.event_sequence.should eq [{:click => 'img'}]
+      driver.quit
+      red_glass.stop
+    end
+    it 'records two click events' do
+      listener = RedGlassListener.new
+      driver = Selenium::WebDriver.for :firefox, :listener => listener
+      red_glass = RedGlass.new driver, {listener: listener}
+      driver.navigate.to "http://google.com"
+      2.times { driver.find_element(:id, 'hplogo').click }
+      red_glass.event_sequence.should eq [{:click => 'img'}, {:click => 'img'}]
+      driver.quit
+      red_glass.stop
+    end
+    it 'records a value change event' do
+      listener = RedGlassListener.new
+      driver = Selenium::WebDriver.for :firefox, :listener => listener
+      red_glass = RedGlass.new driver, {listener: listener}
+      driver.navigate.to "http://google.com"
+      driver.find_element(:name, 'q').send_keys 'a'
+      red_glass.event_sequence.should eq [{:change_value => 'input'}]
+      driver.quit
+      red_glass.stop
+    end
+    it 'records two value change events' do
+      listener = RedGlassListener.new
+      driver = Selenium::WebDriver.for :firefox, :listener => listener
+      red_glass = RedGlass.new driver, {listener: listener}
+      driver.navigate.to "http://google.com"
+      2.times { driver.find_element(:name, 'q').send_keys 'a' }
+      red_glass.event_sequence.should eq [{:change_value => 'input'}, {:change_value => 'input'}]
+      driver.quit
+      red_glass.stop
+    end
+    context 'having navigated to a new page' do
+      it 'clears the sequence' do
+        listener = RedGlassListener.new
+        driver = Selenium::WebDriver.for :firefox, :listener => listener
+        red_glass = RedGlass.new driver, {listener: listener}
+        driver.navigate.to "http://google.com"
+        driver.find_element(:id, 'hplogo').click
+        driver.navigate.to "http://news.google.com"
+        red_glass.event_sequence.empty?.should be_true
+        driver.quit
+        red_glass.stop
+      end
+    end
+  end
 end

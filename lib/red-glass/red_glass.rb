@@ -3,7 +3,7 @@ require "uuid"
 require "net/http"
 
 class RedGlass
-  attr_accessor :driver, :test_id, :opts, :port, :pid, :recording
+  attr_accessor :driver, :test_id, :opts, :port, :pid, :recording, :event_sequence
 
   PROJ_ROOT = File.dirname(__FILE__).to_s
 
@@ -11,6 +11,7 @@ class RedGlass
     @driver = driver
     @opts = opts
     opts[:listener].red_glass = self if opts[:listener]
+    @event_sequence = []
     @recording = false
   end
 
