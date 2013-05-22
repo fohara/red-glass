@@ -60,7 +60,7 @@ class RedGlass
 
   def start_server
     if !is_server_ready? 1
-      @pid = Process.spawn("ruby","#{PROJ_ROOT}/red-glass-app.rb")
+      @pid = Process.spawn("ruby","#{PROJ_ROOT}/red-glass-app/red-glass-app.rb")
       raise "Red Glass server could not bet started." if !is_server_ready?
       Process.detach @pid
     end
@@ -80,19 +80,19 @@ class RedGlass
 
   def load_jQuery
     has_jQuery = @driver.execute_script "var hasJQuery = typeof jQuery == 'function' ? true : false; return hasJQuery"
-    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/public/scripts/jquery-1.8.0.min.js"), 'rb').read
+    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/red-glass-app/public/scripts/jquery-1.8.0.min.js"), 'rb').read
     @driver.execute_script raw_js if !has_jQuery
   end
 
   def load_json2
     has_old_json = @driver.execute_script "var hasOldJSON = typeof JSON.license == 'undefined' ? false : true; return hasOldJSON"
     @driver.execute_script "delete JSON" if has_old_json
-    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/public/scripts/json2.js"), 'rb').read
+    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/red-glass-js/json2.js"), 'rb').read
     @driver.execute_script raw_js
   end
 
   def load_get_path
-    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/public/scripts/jquery.getpath.js"), 'rb').read
+    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/red-glass-js/jquery.getpath.js"), 'rb').read
     @driver.execute_script raw_js
   end
 
@@ -101,7 +101,7 @@ class RedGlass
   end
 
   def load_red_glass_js
-    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/public/scripts/jquery.red-glass-0.1.0.js"), 'rb').read
+    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/red-glass-js/jquery.red-glass-0.1.0.js"), 'rb').read
     @driver.execute_script raw_js if !has_red_glass_js?
     @driver.execute_script("jQuery(document).redGlass('#{@test_id}', '#{@port}')")
     #@driver.execute_script "jQuery.noConflict(true)"

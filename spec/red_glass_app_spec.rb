@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative '../lib/red-glass/red-glass-app'
+require_relative '../lib/red-glass/red-glass-app/red-glass-app'
 
 describe 'RedGlass App' do
 
