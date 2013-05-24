@@ -13,16 +13,19 @@ class RedGlassListener < Selenium::WebDriver::Support::AbstractEventListener
 
   def after_navigate_back(driver)
     @red_glass.event_sequence.clear
+    @red_glass.page_metadata = {}
     @red_glass.reload
   end
 
   def after_navigate_forward(driver)
     @red_glass.event_sequence.clear
+    @red_glass.page_metadata = {}
     @red_glass.reload
   end
 
   def after_navigate_to(url, driver)
     @red_glass.event_sequence.clear
+    @red_glass.page_metadata = {}
     @red_glass.reload
   end
 

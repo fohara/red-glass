@@ -3,7 +3,7 @@ require "uuid"
 require "net/http"
 
 class RedGlass
-  attr_accessor :driver, :test_id, :opts, :port, :pid, :recording, :event_sequence
+  attr_accessor :driver, :test_id, :opts, :port, :pid, :recording, :event_sequence, :page_metadata
 
   PROJ_ROOT = File.dirname(__FILE__).to_s
 
@@ -11,15 +11,15 @@ class RedGlass
     @driver = driver
     @opts = opts
     opts[:listener].red_glass = self if opts[:listener]
+    @test_id = opts[:test_id] || UUID.new.generate
     @event_sequence = []
+    @page_metadata = {}
     @recording = false
   end
 
   def start
     set_config
     start_server
-    uuid = UUID.new
-    @test_id = uuid.generate
     load_js
     @recording = true
   end
@@ -37,6 +37,14 @@ class RedGlass
   def stop
     Process.kill('INT', @pid)
     @recording = false
+  end
+
+  def take_snapshot
+    capture_page_metadata
+    create_page_archive_directory
+    take_screenshot
+    capture_page_source
+    write_metadata
   end
 
   private
@@ -105,6 +113,43 @@ class RedGlass
     @driver.execute_script raw_js if !has_red_glass_js?
     @driver.execute_script("jQuery(document).redGlass('#{@test_id}', '#{@port}')")
     #@driver.execute_script "jQuery.noConflict(true)"
+  end
+
+  def create_page_archive_directory
+    detect_archive_location
+    Dir::mkdir construct_archive_path
+  end
+
+  def construct_archive_path
+    "#{@opts[:archive_location].chomp('/')}/#{@page_metadata[:browser][:name]}_#{@page_metadata[:browser][:version]}_#{@page_metadata[:time]}"
+  end
+
+  def detect_archive_location
+    unless @opts[:archive_location] && File.directory?(@opts[:archive_location])
+      raise 'You must specify a valid archive location by passing an :archive_location option into the RedGlass initializer.'
+    end
+  end
+
+  def capture_page_metadata
+    @page_metadata[:test_id] = @test_id
+    @page_metadata[:time] = Time.now.to_i
+    @page_metadata[:page_url] = @driver.current_url
+    @page_metadata[:browser] = {name: @driver.capabilities[:browser_name],
+                                        version: @driver.capabilities[:version],
+                                        platform: @driver.capabilities[:platform].to_s}
+    @page_metadata[:event_sequence] = @event_sequence
+  end
+
+  def take_screenshot
+    @driver.save_screenshot "#{construct_archive_path}/screenshot.png"
+  end
+
+  def capture_page_source
+    File.open("#{construct_archive_path}/source.html", 'w') { |file| file.write @driver.page_source }
+  end
+
+  def write_metadata
+    File.open("#{construct_archive_path}/metadata.json", 'w') { |file| file.write @page_metadata.to_json }
   end
 
 end

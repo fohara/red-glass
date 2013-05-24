@@ -132,4 +132,61 @@ describe RedGlass do
       end
     end
   end
+
+  describe '#take_snapshot' do
+    context 'with required RedGlass options' do
+      before :each do
+        @internal_methods = [:capture_page_metadata, :create_page_archive_directory, :take_screenshot, :capture_page_source, :write_metadata]
+        listener = RedGlassListener.new
+        @driver = double('driver')
+        @red_glass = RedGlass.new @driver, {listener: listener, archive_location: ''}
+      end
+
+      it 'captures page metadata' do
+        @internal_methods.delete_if { |method| method == :capture_page_metadata}.each do |method|
+          @red_glass.stub(method)
+        end
+        @red_glass.should_receive(:capture_page_metadata).once
+        @red_glass.take_snapshot
+      end
+      it 'creates an archive location' do
+        @internal_methods.delete_if { |method| method == :create_page_archive_directory}.each do |method|
+          @red_glass.stub(method)
+        end
+        @red_glass.should_receive(:create_page_archive_directory).once
+        @red_glass.take_snapshot
+      end
+      it 'takes a screenshot' do
+        @internal_methods.delete_if { |method| method == :take_screenshot}.each do |method|
+          @red_glass.stub(method)
+        end
+        @red_glass.should_receive(:take_screenshot).once
+        @red_glass.take_snapshot
+      end
+      it 'captures page source' do
+        @internal_methods.delete_if { |method| method == :capture_page_source}.each do |method|
+          @red_glass.stub(method)
+        end
+        @red_glass.should_receive(:capture_page_source).once
+        @red_glass.take_snapshot
+      end
+      it 'writes metadata' do
+        @internal_methods.delete_if { |method| method == :write_metadata}.each do |method|
+          @red_glass.stub(method)
+        end
+        @red_glass.should_receive(:write_metadata).once
+        @red_glass.take_snapshot
+      end
+    end
+
+    context 'without an archive location' do
+      it 'raises an error' do
+        listener = RedGlassListener.new
+        driver = double('driver')
+        red_glass = RedGlass.new driver, {listener: listener}
+        red_glass.stub(:capture_page_metadata)
+        expect { red_glass.take_snapshot }.to raise_error('You must specify a valid archive location by passing an :archive_location option into the RedGlass initializer.')
+      end
+    end
+  end
 end
