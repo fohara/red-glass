@@ -136,7 +136,7 @@ describe RedGlass do
   describe '#take_snapshot' do
     context 'with required RedGlass options' do
       before :each do
-        @internal_methods = [:capture_page_metadata, :create_page_archive_directory, :take_screenshot, :capture_page_source, :write_metadata]
+        @internal_methods = [:capture_page_metadata, :create_page_archive_directory, :take_screenshot, :capture_page_source, :serialize_dom, :write_metadata]
         listener = RedGlassListener.new
         @driver = double('driver')
         @red_glass = RedGlass.new @driver, {listener: listener, archive_location: ''}
@@ -170,6 +170,13 @@ describe RedGlass do
         @red_glass.should_receive(:capture_page_source).once
         @red_glass.take_snapshot
       end
+      it 'serializes the DOM' do
+        @internal_methods.delete_if { |method| method == :serialize_dom}.each do |method|
+          @red_glass.stub(method)
+        end
+        @red_glass.should_receive(:serialize_dom).once
+        @red_glass.take_snapshot
+      end
       it 'writes metadata' do
         @internal_methods.delete_if { |method| method == :write_metadata}.each do |method|
           @red_glass.stub(method)
@@ -188,5 +195,6 @@ describe RedGlass do
         expect { red_glass.take_snapshot }.to raise_error('You must specify a valid archive location by passing an :archive_location option into the RedGlass initializer.')
       end
     end
+
   end
 end

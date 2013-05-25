@@ -44,6 +44,7 @@ class RedGlass
     create_page_archive_directory
     take_screenshot
     capture_page_source
+    serialize_dom
     write_metadata
   end
 
@@ -150,6 +151,28 @@ class RedGlass
 
   def write_metadata
     File.open("#{construct_archive_path}/metadata.json", 'w') { |file| file.write @page_metadata.to_json }
+  end
+
+  def write_serialized_dom(dom_json_string)
+    File.open("#{construct_archive_path}/dom.json", 'w') { |file| file.write dom_json_string }
+  end
+
+  def serialize_dom
+    dom_json_string = "{\n\t\"browser\":" + "\"" + @page_metadata[:browser][:name] + "\","
+    dom_json_string += "\n\t\"elements\":\n\t[\n\t"
+    serialize_dom_js_string = stringify_serialize_dom_js
+    dom_json_string += @driver.execute_script(serialize_dom_js_string + " return RecurseDomJSON(domgun.query('*'),'')")
+    dom_json_string = dom_json_string[0, (dom_json_string.length - 3)] + "\n\t]\n}"
+    @page_metadata[:doc_width] = @driver.execute_script(serialize_dom_js_string + " return domgun.query(document).width()")
+    @page_metadata[:doc_height] = @driver.execute_script(serialize_dom_js_string + " return domgun.query(document).height()")
+    write_serialized_dom dom_json_string
+  end
+
+  def stringify_serialize_dom_js
+    domgun_recurse_dom_file = File.open("#{PROJ_ROOT}/red-glass-js/serialize-dom.js", 'rb')
+    domgun_recurse_dom_string = domgun_recurse_dom_file.read
+    domgun_recurse_dom_file.close
+    domgun_recurse_dom_string
   end
 
 end
