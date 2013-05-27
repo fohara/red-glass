@@ -1,3 +1,7 @@
+# 0.1.0
+
+- Capture page state via the RedGlass#take_snapshot method.
+
 # 0.0.6
 
 - Observe WebDriver events by passing in a RedGlassListener to the driver initializer instead of monkey patching.
