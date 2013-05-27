@@ -1,3 +1,7 @@
+# 0.1.1
+
+- Explicitly require RedGlassListener.
+
 # 0.1.0
 
 - Capture page state via the RedGlass#take_snapshot method.
