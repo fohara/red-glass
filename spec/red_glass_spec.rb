@@ -134,6 +134,18 @@ describe RedGlass do
   end
 
   describe '#take_snapshot' do
+    it 'creates an archive directory' do
+      listener = RedGlassListener.new
+      driver = Selenium::WebDriver.for :firefox, :listener => listener
+      dir = Dir.mktmpdir
+      red_glass = RedGlass.new driver, {listener: listener, archive_location: dir, test_id: 1}
+      driver.navigate.to "http://google.com"
+      red_glass.take_snapshot
+      driver.quit
+      red_glass.stop
+      File.directory?("#{dir}/1").should be_true
+      FileUtils.remove_entry dir
+    end
     context 'with required RedGlass options' do
       before :each do
         @internal_methods = [:capture_page_metadata, :create_page_archive_directory, :take_screenshot, :capture_page_source, :serialize_dom, :write_metadata]

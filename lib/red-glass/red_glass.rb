@@ -3,7 +3,7 @@ require "uuid"
 require "net/http"
 
 class RedGlass
-  attr_accessor :driver, :test_id, :opts, :port, :pid, :recording, :event_sequence, :page_metadata
+  attr_accessor :driver, :test_id, :opts, :port, :pid, :recording, :event_sequence, :page_metadata, :archive_dir
 
   PROJ_ROOT = File.dirname(__FILE__).to_s
 
@@ -118,11 +118,15 @@ class RedGlass
 
   def create_page_archive_directory
     detect_archive_location
-    Dir::mkdir construct_archive_path
+    unless @archive_dir
+      @archive_dir = "#{@opts[:archive_location].chomp('/')}/#{@test_id}"
+      Dir::mkdir @archive_dir unless File.directory? @archive_dir
+    end
+    Dir::mkdir construct_page_archive_path
   end
 
-  def construct_archive_path
-    "#{@opts[:archive_location].chomp('/')}/#{@page_metadata[:browser][:name]}_#{@page_metadata[:browser][:version]}_#{@page_metadata[:time]}"
+  def construct_page_archive_path
+    "#{@archive_dir}/#{@page_metadata[:browser][:name]}_#{@page_metadata[:browser][:version]}_#{@page_metadata[:time]}"
   end
 
   def detect_archive_location
@@ -142,19 +146,19 @@ class RedGlass
   end
 
   def take_screenshot
-    @driver.save_screenshot "#{construct_archive_path}/screenshot.png"
+    @driver.save_screenshot "#{construct_page_archive_path}/screenshot.png"
   end
 
   def capture_page_source
-    File.open("#{construct_archive_path}/source.html", 'w') { |file| file.write @driver.page_source }
+    File.open("#{construct_page_archive_path}/source.html", 'w') { |file| file.write @driver.page_source }
   end
 
   def write_metadata
-    File.open("#{construct_archive_path}/metadata.json", 'w') { |file| file.write @page_metadata.to_json }
+    File.open("#{construct_page_archive_path}/metadata.json", 'w') { |file| file.write @page_metadata.to_json }
   end
 
   def write_serialized_dom(dom_json_string)
-    File.open("#{construct_archive_path}/dom.json", 'w') { |file| file.write dom_json_string }
+    File.open("#{construct_page_archive_path}/dom.json", 'w') { |file| file.write dom_json_string }
   end
 
   def serialize_dom
