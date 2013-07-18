@@ -148,7 +148,7 @@ describe RedGlass do
     end
     context 'with required RedGlass options' do
       before :each do
-        @internal_methods = [:capture_page_metadata, :create_page_archive_directory, :take_screenshot, :capture_page_source, :serialize_dom, :write_metadata]
+        @internal_methods = [:capture_page_metadata, :create_page_archive_directory, :take_screenshot, :capture_page_source, :load_js, :serialize_dom, :write_metadata]
         listener = RedGlassListener.new
         @driver = double('driver')
         @red_glass = RedGlass.new @driver, {listener: listener, archive_location: ''}

@@ -44,6 +44,7 @@ class RedGlass
     create_page_archive_directory
     take_screenshot
     capture_page_source
+    load_js
     serialize_dom
     write_metadata
   end
@@ -81,39 +82,17 @@ class RedGlass
   end
 
   def load_js
-    load_jQuery
-    load_json2
-    load_get_path
-    load_red_glass_js
+    load_red_glass_carryall unless has_red_glass_js?
   end
 
-  def load_jQuery
-    has_jQuery = @driver.execute_script "var hasJQuery = typeof jQuery == 'function' ? true : false; return hasJQuery"
-    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/red-glass-app/public/scripts/jquery-1.8.0.min.js"), 'rb').read
-    @driver.execute_script raw_js if !has_jQuery
-  end
-
-  def load_json2
-    has_old_json = @driver.execute_script "var hasOldJSON = typeof JSON.license == 'undefined' ? false : true; return hasOldJSON"
-    @driver.execute_script "delete JSON" if has_old_json
-    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/red-glass-js/json2.js"), 'rb').read
+  def load_red_glass_carryall
+    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/red-glass-js/redglass.carryall.js"), 'rb').read
     @driver.execute_script raw_js
-  end
-
-  def load_get_path
-    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/red-glass-js/jquery.getpath.js"), 'rb').read
-    @driver.execute_script raw_js
+    @driver.execute_script("jQuery(document).redGlass('#{@test_id}', '#{@port}')")
   end
 
   def has_red_glass_js?
-    @driver.execute_script "var hasRedGlass = typeof jQuery().redGlass == 'function' ? true : false; return hasRedGlass"
-  end
-
-  def load_red_glass_js
-    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/red-glass-js/jquery.red-glass-0.1.0.js"), 'rb').read
-    @driver.execute_script raw_js if !has_red_glass_js?
-    @driver.execute_script("jQuery(document).redGlass('#{@test_id}', '#{@port}')")
-    #@driver.execute_script "jQuery.noConflict(true)"
+    @driver.execute_script "var hasRedGlass = (typeof jQuery == 'function' && typeof jQuery().redGlass == 'function') ? true : false; return hasRedGlass"
   end
 
   def create_page_archive_directory
@@ -165,10 +144,10 @@ class RedGlass
     dom_json_string = "{\n\t\"browser\":" + "\"" + @page_metadata[:browser][:name] + "\","
     dom_json_string += "\n\t\"elements\":\n\t[\n\t"
     serialize_dom_js_string = stringify_serialize_dom_js
-    dom_json_string += @driver.execute_script(serialize_dom_js_string + " return RecurseDomJSON(domgun.query('*'),'')")
+    dom_json_string += @driver.execute_script(serialize_dom_js_string + " return RecurseDomJSON(rgUtils.query('*'),'')")
     dom_json_string = dom_json_string[0, (dom_json_string.length - 3)] + "\n\t]\n}"
-    @page_metadata[:doc_width] = @driver.execute_script(serialize_dom_js_string + " return domgun.query(document).width()")
-    @page_metadata[:doc_height] = @driver.execute_script(serialize_dom_js_string + " return domgun.query(document).height()")
+    @page_metadata[:doc_width] = @driver.execute_script(serialize_dom_js_string + " return rgUtils.query(document).width()")
+    @page_metadata[:doc_height] = @driver.execute_script(serialize_dom_js_string + " return rgUtils.query(document).height()")
     write_serialized_dom dom_json_string
   end
 

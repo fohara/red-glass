@@ -34,17 +34,17 @@ describe 'RedGlass App' do
     describe 'POST' do
       it 'returns multiple events' do
         2.times do
-          post '/', 'event_json' => event_json.to_json
+          post '/', {event_json: event_json}.to_json
         end
         get '/events'
         JSON.parse(last_response.body).size.should eq 2
       end
       it 'returns a success response code' do
-        post '/', 'event_json' => event_json.to_json
+        post '/', {event_json: event_json}.to_json
         last_response.ok?.should be_true
       end
       it 'returns correctly structured JSON' do
-        post '/', 'event_json' => event_json.to_json
+        post '/', {event_json: event_json}.to_json
         get '/events'
         event_keys.each do |key|
           JSON.parse(last_response.body).first[key].should eq event_json[key]

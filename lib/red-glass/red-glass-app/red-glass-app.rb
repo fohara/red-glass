@@ -16,7 +16,8 @@ class RedGlassApp < Sinatra::Base
   end
 
   post '/?' do
-    event = JSON.parse(params[:event_json])
+    request.body.rewind
+    event = JSON.parse(request.body.read)['event_json']
     begin
       uuid = UUID.new
       event['id'] = uuid.generate
