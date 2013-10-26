@@ -1,3 +1,8 @@
+# 0.1.2
+
+- Begin using Carryall to conditionally load JavaScript dependencies.
+- Do not use jQuery.noConflict().
+
 # 0.1.1
 
 - Explicitly require RedGlassListener.
