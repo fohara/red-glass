@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.files       = Dir.glob("{lib}/**/*")
   s.homepage    = 'https://github.com/fohara/red-glass'
   s.add_dependency 'sinatra'
-  s.add_dependency 'em-websocket'
+  s.add_dependency 'em-websocket', '~> 0.5.0'
   s.add_dependency 'thin'
   s.add_dependency 'selenium-webdriver', '>= 2.32.0'
   s.add_dependency 'json'
