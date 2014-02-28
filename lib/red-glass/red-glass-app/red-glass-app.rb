@@ -1,7 +1,7 @@
 require 'sinatra/base'
 require 'thin'
 require 'em-websocket'
-require "uuid"
+require 'uuid'
 require 'json'
 
 class RedGlassApp < Sinatra::Base
