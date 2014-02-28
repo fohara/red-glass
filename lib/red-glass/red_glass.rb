@@ -152,10 +152,10 @@ class RedGlass
   end
 
   def stringify_serialize_dom_js
-    domgun_recurse_dom_file = File.open("#{PROJ_ROOT}/red-glass-js/serialize-dom.js", 'rb')
-    domgun_recurse_dom_string = domgun_recurse_dom_file.read
-    domgun_recurse_dom_file.close
-    domgun_recurse_dom_string
+    recurse_dom_file = File.open("#{PROJ_ROOT}/red-glass-js/serialize-dom.js", 'rb')
+    recurse_dom_string = recurse_dom_file.read
+    recurse_dom_file.close
+    recurse_dom_string
   end
 
 end
