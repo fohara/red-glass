@@ -51,27 +51,32 @@ class RedGlass
 
   private
 
-  def is_server_ready?(time_limit=30)
-    is_server_ready = false
-    uri = URI.parse("http://localhost:#{@port}/status")
-    counter = 0
-    loop do
-      sleep(1)
-      counter = counter + 1
+  def server_ready?(time_limit=30)
+    ready, elapsed = false, 0
+    until ready || elapsed >= time_limit
       begin
-        is_server_ready = Net::HTTP.get_response(uri).code.to_s == '200' ? true : false
+        ready = Net::HTTP.get_response(server_uri).code.to_s == '200' ? true : false
       rescue
-        is_server_ready = false
+        ready = false
       end
-      break if is_server_ready || counter >= time_limit
+      elapsed = increment_elapsed(elapsed) unless ready
     end
-    is_server_ready
+    ready
+  end
+
+  def increment_elapsed(elapsed)
+    sleep 1
+    elapsed + 1
+  end
+
+  def server_uri
+    URI.parse("http://localhost:#{@port}/status")
   end
 
   def start_server
-    unless is_server_ready? 1
+    unless server_ready? 1
       @pid = Process.spawn('ruby',"#{PROJ_ROOT}/red-glass-app/red-glass-app.rb")
-      raise 'Red Glass server could not bet started.' unless is_server_ready?
+      raise 'Red Glass server could not bet started.' unless server_ready?
       Process.detach @pid
     end
   end
