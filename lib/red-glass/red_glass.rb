@@ -69,9 +69,9 @@ class RedGlass
   end
 
   def start_server
-    if !is_server_ready? 1
+    unless is_server_ready? 1
       @pid = Process.spawn("ruby","#{PROJ_ROOT}/red-glass-app/red-glass-app.rb")
-      raise "Red Glass server could not bet started." if !is_server_ready?
+      raise "Red Glass server could not bet started." unless is_server_ready?
       Process.detach @pid
     end
   end
