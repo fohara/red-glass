@@ -1,6 +1,6 @@
-require "selenium-webdriver"
-require "uuid"
-require "net/http"
+require 'selenium-webdriver'
+require 'uuid'
+require 'net/http'
 
 class RedGlass
   attr_accessor :driver, :test_id, :opts, :port, :pid, :recording, :event_sequence, :page_metadata, :archive_dir
@@ -71,7 +71,7 @@ class RedGlass
   def start_server
     unless is_server_ready? 1
       @pid = Process.spawn("ruby","#{PROJ_ROOT}/red-glass-app/red-glass-app.rb")
-      raise "Red Glass server could not bet started." unless is_server_ready?
+      raise 'Red Glass server could not bet started.' unless is_server_ready?
       Process.detach @pid
     end
   end
@@ -146,8 +146,8 @@ class RedGlass
     serialize_dom_js_string = stringify_serialize_dom_js
     dom_json_string += @driver.execute_script(serialize_dom_js_string + " return RecurseDomJSON(rgUtils.query('*'),'')")
     dom_json_string = dom_json_string[0, (dom_json_string.length - 3)] + "\n\t]\n}"
-    @page_metadata[:doc_width] = @driver.execute_script(serialize_dom_js_string + " return rgUtils.query(document).width()")
-    @page_metadata[:doc_height] = @driver.execute_script(serialize_dom_js_string + " return rgUtils.query(document).height()")
+    @page_metadata[:doc_width] = @driver.execute_script(serialize_dom_js_string + ' return rgUtils.query(document).width()')
+    @page_metadata[:doc_height] = @driver.execute_script(serialize_dom_js_string + ' return rgUtils.query(document).height()')
     write_serialized_dom dom_json_string
   end
 
