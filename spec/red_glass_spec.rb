@@ -82,6 +82,7 @@ describe RedGlass do
       listener = RedGlassListener.new
       driver = Selenium::WebDriver.for :firefox, :listener => listener
       red_glass = RedGlass.new driver, {listener: listener}
+      red_glass.start
       driver.navigate.to 'http://google.com'
       driver.find_element(:id, 'hplogo').click
       red_glass.event_sequence.should eq [{:click => 'img'}]
@@ -92,6 +93,7 @@ describe RedGlass do
       listener = RedGlassListener.new
       driver = Selenium::WebDriver.for :firefox, :listener => listener
       red_glass = RedGlass.new driver, {listener: listener}
+      red_glass.start
       driver.navigate.to 'http://google.com'
       2.times { driver.find_element(:id, 'hplogo').click }
       red_glass.event_sequence.should eq [{:click => 'img'}, {:click => 'img'}]
@@ -102,6 +104,7 @@ describe RedGlass do
       listener = RedGlassListener.new
       driver = Selenium::WebDriver.for :firefox, :listener => listener
       red_glass = RedGlass.new driver, {listener: listener}
+      red_glass.start
       driver.navigate.to 'http://google.com'
       driver.find_element(:name, 'q').send_keys 'a'
       red_glass.event_sequence.should eq [{:change_value => 'input'}]
@@ -112,6 +115,7 @@ describe RedGlass do
       listener = RedGlassListener.new
       driver = Selenium::WebDriver.for :firefox, :listener => listener
       red_glass = RedGlass.new driver, {listener: listener}
+      red_glass.start
       driver.navigate.to 'http://google.com'
       2.times { driver.find_element(:name, 'q').send_keys 'a' }
       red_glass.event_sequence.should eq [{:change_value => 'input'}, {:change_value => 'input'}]
@@ -123,6 +127,7 @@ describe RedGlass do
         listener = RedGlassListener.new
         driver = Selenium::WebDriver.for :firefox, :listener => listener
         red_glass = RedGlass.new driver, {listener: listener}
+        red_glass.start
         driver.navigate.to 'http://google.com'
         driver.find_element(:id, 'hplogo').click
         driver.navigate.to 'http://news.google.com'
