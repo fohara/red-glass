@@ -35,7 +35,7 @@ class RedGlass
   end
 
   def stop
-    Process.kill('INT', @pid)
+    Process.kill('INT', @pid) if @pid
     @recording = false
   end
 
