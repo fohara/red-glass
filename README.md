@@ -8,7 +8,7 @@ To use RedGlass on a single page, simply pass it the driver instance. RedGlass w
 
 ```ruby
 driver = Selenium::WebDriver.for :firefox
-red_glass = RedGlass.new driver
+red_glass = RedGlass.new(driver, { server_log: true })
 
 driver.get "http://google.com"
 red_glass.start
@@ -76,4 +76,4 @@ as an aide for writing complex UI tests, and not necessarily as a persistent log
 
 # License
 
-The MIT License - Copyright (c) 2013 Frank O'Hara
+The MIT License - Copyright (c) 2014 Frank O'Hara

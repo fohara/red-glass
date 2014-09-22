@@ -1,3 +1,8 @@
+# 0.1.3
+
+- Support https and redglass.js 0.3.1
+- Update RSpec (3.1.1), ruby (2.1.0) and selenium-webdriver (2.42.0)
+
 # 0.1.2
 
 - Begin using Carryall to conditionally load JavaScript dependencies.
