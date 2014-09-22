@@ -1,6 +1,8 @@
 require 'selenium-webdriver'
 require 'uuid'
 require 'net/http'
+require 'open-uri'
+require 'openssl'
 
 class RedGlass
   attr_accessor :driver, :test_id, :opts, :port, :pid, :recording, :event_sequence, :page_metadata, :archive_dir
@@ -12,6 +14,7 @@ class RedGlass
     @opts = opts
     opts[:listener].red_glass = self if opts[:listener]
     @test_id = opts[:test_id] || UUID.new.generate
+    @server_log = opts[:server_log] || false
     @event_sequence = []
     @page_metadata = {}
     @recording = false
@@ -51,11 +54,15 @@ class RedGlass
 
   private
 
-  def server_ready?(time_limit=30)
+  def server_ready?(time_limit=60)
     ready, elapsed = false, 0
     until ready || elapsed >= time_limit
       begin
-        ready = Net::HTTP.get_response(server_uri).code.to_s == '200' ? true : false
+        http = Net::HTTP.new(server_uri.host, server_uri.port)
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        response = http.get(server_uri.request_uri)
+        ready = response.code.to_s == '200' ? true : false
       rescue
         ready = false
       end
@@ -70,12 +77,12 @@ class RedGlass
   end
 
   def server_uri
-    URI.parse("http://localhost:#{@port}/status")
+    URI.parse("https://localhost:#{@port}/status")
   end
 
   def start_server
     unless server_ready? 1
-      @pid = Process.spawn('ruby',"#{PROJ_ROOT}/red-glass-app/red-glass-app.rb")
+      @pid = Process.spawn("ruby #{PROJ_ROOT}/red-glass-app/red-glass-app.rb")
       raise 'Red Glass server could not bet started.' unless server_ready?
       Process.detach @pid
     end
@@ -91,13 +98,20 @@ class RedGlass
   end
 
   def load_red_glass_carryall
-    raw_js = File.open(File.expand_path("#{PROJ_ROOT}/red-glass-js/redglass.carryall.js"), 'rb').read
+    carryall_path = "#{PROJ_ROOT}/red-glass-js/redglass.carryall.js"
+    encoded_lines = IO.readlines(File.expand_path(carryall_path)).map do |line|
+      line.encode('ASCII-8BIT', :invalid => :replace, :undef => :replace)
+    end
+    File.open(carryall_path, "w") do |file|
+      file.puts(encoded_lines)
+    end
+    raw_js = File.open(File.expand_path(carryall_path), 'rb').read
     @driver.execute_script raw_js
-    @driver.execute_script("jQuery(document).redGlass('#{@test_id}', '#{@port}')")
+    @driver.execute_script("jQuery(document).redGlass({testId: '#{@test_id}', port: '#{@port}', useServerLog: #{@server_log}})")
   end
 
   def has_red_glass_js?
-    @driver.execute_script "var hasRedGlass = (typeof jQuery == 'function' && typeof jQuery().redGlass == 'function') ? true : false; return hasRedGlass"
+    @driver.execute_script "return typeof jQuery == 'function' && typeof jQuery().redGlass == 'function';"
   end
 
   def create_page_archive_directory
