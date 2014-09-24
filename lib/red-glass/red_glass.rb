@@ -160,21 +160,12 @@ class RedGlass
   end
 
   def serialize_dom
-    dom_json_string = "{\n\t\"browser\":" + "\"" + @page_metadata[:browser][:name] + "\","
-    dom_json_string += "\n\t\"elements\":\n\t[\n\t"
-    serialize_dom_js_string = stringify_serialize_dom_js
-    dom_json_string += @driver.execute_script(serialize_dom_js_string + " return RecurseDomJSON(rgUtils.query('*'),'')")
-    dom_json_string = dom_json_string[0, (dom_json_string.length - 3)] + "\n\t]\n}"
-    @page_metadata[:doc_width] = @driver.execute_script(serialize_dom_js_string + ' return rgUtils.query(document).width()')
-    @page_metadata[:doc_height] = @driver.execute_script(serialize_dom_js_string + ' return rgUtils.query(document).height()')
-    write_serialized_dom dom_json_string
-  end
-
-  def stringify_serialize_dom_js
-    recurse_dom_file = File.open("#{PROJ_ROOT}/red-glass-js/serialize-dom.js", 'rb')
-    recurse_dom_string = recurse_dom_file.read
-    recurse_dom_file.close
-    recurse_dom_string
+    dom = JSON.parse(@driver.execute_script("return JSON.stringify(jQuery(document).redGlass('serializeDOM'));"),
+                     { symbolize_names: true })
+    dom[:browser] = @page_metadata[:browser][:name]
+    @page_metadata[:doc_width] = dom[:width]
+    @page_metadata[:doc_height] = dom[:height]
+    write_serialized_dom(dom.to_json)
   end
 
 end
