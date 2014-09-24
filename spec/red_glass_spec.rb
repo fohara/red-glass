@@ -90,9 +90,9 @@ describe RedGlass do
       driver = Selenium::WebDriver.for :firefox, :listener => listener
       red_glass = RedGlass.new driver, {listener: listener}
       red_glass.start
-      driver.navigate.to 'http://google.com'
-      driver.find_element(:id, 'hplogo').click
-      expect(red_glass.event_sequence).to eq [{:click => 'img'}]
+      driver.navigate.to 'http://example.com'
+      driver.find_element(:tag_name, 'h1').click
+      expect(red_glass.event_sequence).to eq [{:click => 'h1'}]
       driver.quit
       red_glass.stop
     end
@@ -101,9 +101,9 @@ describe RedGlass do
       driver = Selenium::WebDriver.for :firefox, :listener => listener
       red_glass = RedGlass.new driver, {listener: listener}
       red_glass.start
-      driver.navigate.to 'http://google.com'
-      2.times { driver.find_element(:id, 'hplogo').click }
-      expect(red_glass.event_sequence).to eq [{:click => 'img'}, {:click => 'img'}]
+      driver.navigate.to 'http://example.com'
+      2.times { driver.find_element(:tag_name, 'h1').click }
+      expect(red_glass.event_sequence).to eq [{:click => 'h1'}, {:click => 'h1'}]
       driver.quit
       red_glass.stop
     end
@@ -156,6 +156,28 @@ describe RedGlass do
       driver.quit
       red_glass.stop
       expect(File.directory?("#{dir}/1")).to be_truthy
+      FileUtils.remove_entry dir
+    end
+    it 'serializes the DOM' do
+      listener = RedGlassListener.new
+      driver = Selenium::WebDriver.for :firefox, :listener => listener
+      dir = Dir.mktmpdir
+      red_glass = RedGlass.new driver, {listener: listener, archive_location: dir, test_id: 1}
+      driver.navigate.to 'http://example.com'
+      red_glass.take_snapshot
+      driver.quit
+      red_glass.stop
+
+      expect(File.directory?("#{dir}/1")).to be_truthy
+      archive_dir = `ls -d #{dir}/1/*/`
+      dom = JSON.parse(File.open("#{archive_dir.chomp}dom.json", 'rb').read, { symbolize_names: true})
+      expect(dom.has_key?(:browser)).to be_truthy
+      expect(dom.has_key?(:elements)).to be_truthy
+      html_node = dom[:elements].first
+      expect(html_node[:tagName]).to eq 'HTML'
+      expect(html_node[:top]).to eq 0
+      expect(html_node[:left]).to eq 0
+      expect(html_node[:xpath]).to eq '//html[1]'
       FileUtils.remove_entry dir
     end
     context 'with required RedGlass options' do
